@@ -89,4 +89,4 @@ body:
         确认一遍
       options:
         - label: "我已完成且认真地填写完了报告所需要的信息"
-        - label: "我确保没有重复的报告 [(搜索一下)](https://github.com/CaaMoe/MultiLogin/issues?q=is%3Aissue)"
+        - label: "我确保没有重复的报告 [(搜索一下)](https://github.com/TeamVastsea/MultiLoginReloaded/issues?q=is%3Aissue)"

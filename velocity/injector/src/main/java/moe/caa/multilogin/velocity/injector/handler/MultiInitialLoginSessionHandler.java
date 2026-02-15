@@ -219,7 +219,7 @@ public class MultiInitialLoginSessionHandler {
                                 try {
                                     this.mcConnection.setActiveSessionHandler(StateRegistry.LOGIN,
                                             (AuthSessionHandler) authSessionHandler_allArgsConstructor.invoke(
-                                    this.server, inbound, generateGameProfile(finalGameProfile), true, serverId
+                                                    this.server, inbound, generateGameProfile(finalGameProfile), true, serverId
                                             ));
                                 } catch (Throwable e) {
                                     throw new RuntimeException(e);
@@ -229,7 +229,7 @@ public class MultiInitialLoginSessionHandler {
                             this.inbound.disconnect(Component.text(result.getKickMessage()));
                         }
                     }
-                } catch (Throwable e){
+                } catch (Throwable e) {
                     LoggerProvider.getLogger().error("An exception occurred while processing validation results.", e);
                     if (isEncrypted()) {
                         getInbound().disconnect(Component.text(multiCoreAPI.getLanguageHandler().getMessage("auth_error")));
