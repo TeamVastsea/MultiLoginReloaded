@@ -4,7 +4,8 @@ import java.text.SimpleDateFormat
 
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.8.0' apply false
+//    id 'org.jetbrains.kotlin.jvm' version '1.8.0' apply false
+    id 'org.jetbrains.kotlin.jvm' version '1.9.22' apply false
 }
 
 apply from: './constant.gradle'
@@ -42,8 +43,8 @@ subprojects {
     }
 
     dependencies {
-        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.38'
-        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.38'
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
 
         compileOnly("org.jetbrains:annotations:24.1.0")
         annotationProcessor("org.jetbrains:annotations:24.1.0")
