@@ -39,7 +39,9 @@ public class CheckUpdater {
                 .readTimeout(Duration.ofMillis(2000))
                 .connectTimeout(Duration.ofMillis(2000))
                 .build();
-        Request build = new Request.Builder().get().url("https://api.github.com/repos/CaaMoe/MultiLogin/contents/latest").build();
+//        Request build = new Request.Builder().get().url("https://api.github.com/repos/CaaMoe/MultiLogin/contents/latest").build();
+        // 新仓库地址更换
+        Request build = new Request.Builder().get().url("https://api.github.com/repos/TeamVastsea/MultiLoginReloaded/contents/latest").build();
         Call call = client.newCall(build);
         try (Response execute = call.execute();
              ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -68,6 +70,11 @@ public class CheckUpdater {
                             ValueUtil.join(", ", " and ", latestVersionNow.stream()
                                     .map(Object::toString).collect(Collectors.toList()))
                     ));
+                    // 中文
+                    LoggerProvider.getLogger().info(String.format("你的 MultiLogin 版本并非最新版, 最新版本是 %s, 请更新",
+                            ValueUtil.join(", ", " 和 ", latestVersionNow.stream()
+                                    .map(Object::toString).collect(Collectors.toList()))
+                    ));
                 } else {
                     SemVersion sv = core.getSemVersion();
                     for (SemVersion version : latestVersionNow) {
@@ -79,11 +86,15 @@ public class CheckUpdater {
                         LoggerProvider.getLogger().info(
                                 String.format("The latest recommended version is %s, Please update.", sv
                                 ));
+                        LoggerProvider.getLogger().info(
+                                String.format("你的 MultiLogin 版本并非最新版, 最新版本为 %s, 请更新", sv
+                                ));
                     }
                 }
             } catch (IOException e) {
-                LoggerProvider.getLogger().debug("Check update failure.", e);
+                LoggerProvider.getLogger().debug("更新检查失败...", e);
             }
         }, 0, 1000 * 60 * 60 * 12); // 半天一次更新检查
+//        }, 0, 10 * 1000); // 10秒一次 测试用
     }
 }
