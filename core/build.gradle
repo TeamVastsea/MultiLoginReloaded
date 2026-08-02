@@ -12,6 +12,10 @@ dependencies {
     compileOnly project(":flows")
     compileOnly 'org.geysermc.floodgate:api:2.2.2-SNAPSHOT'
     compileOnly 'org.geysermc.geyser:api:2.2.0-SNAPSHOT'
+
+    // 单元测试需要在运行期加载 api 和 flows 的类
+    testImplementation project(":api")
+    testImplementation project(":flows")
 }
 
 shadowJar {
