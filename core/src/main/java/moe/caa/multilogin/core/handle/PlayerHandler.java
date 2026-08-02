@@ -135,34 +135,42 @@ public class PlayerHandler implements HandlerAPI {
 
     public void register() {
         core.getPlugin().getRunServer().getScheduler().runTaskAsyncTimer(() -> {
-            // 存放在线的所有玩家
-            Set<UUID> onlinePlayerUUIDs = core.getPlugin().getRunServer().getPlayerManager().getOnlinePlayers().stream()
-                    .map(IPlayer::getUniqueId).collect(Collectors.toSet());
-
-            // 遍历当前缓存，获取失效的数据列表
-            Set<Map.Entry<UUID, Entry>> noExists = cache.entrySet().stream().filter(e -> !onlinePlayerUUIDs.contains(e.getKey())).collect(Collectors.toSet());
-
+            // scheduleAtFixedRate 的语义是任务抛出异常后不再被调度，
+            // 因此这里必须捕获所有异常，否则一次失败就会让缓存永久不再清理，造成内存泄漏。
             try {
-                Thread.sleep(1000 * 10);
-            } catch (InterruptedException e) {
-                LoggerProvider.getLogger().error("An exception occurred on the delayed cache clearing.", e);
+                clearInvalidCache();
+            } catch (Throwable throwable) {
+                LoggerProvider.getLogger().error("An exception occurred on the delayed cache clearing.", throwable);
             }
-
-            // 移除失效的数据
-            for (Map.Entry<UUID, Entry> e : noExists) {
-                Entry entry = cache.get(e.getKey());
-
-                // 数据已被移除
-                if (entry == null) continue;
-
-                // 在移除前数据被更改
-                if (!e.getValue().equals(entry)) continue;
-
-                // 进行移除
-                cache.remove(e.getKey());
-            }
-
         }, 0, 1000 * 60);
+    }
+
+    /**
+     * 清理已经离线的玩家缓存
+     */
+    private void clearInvalidCache() throws InterruptedException {
+        // 存放在线的所有玩家
+        Set<UUID> onlinePlayerUUIDs = core.getPlugin().getRunServer().getPlayerManager().getOnlinePlayers().stream()
+                .map(IPlayer::getUniqueId).collect(Collectors.toSet());
+
+        // 遍历当前缓存，获取失效的数据列表
+        Set<Map.Entry<UUID, Entry>> noExists = cache.entrySet().stream().filter(e -> !onlinePlayerUUIDs.contains(e.getKey())).collect(Collectors.toSet());
+
+        Thread.sleep(1000 * 10);
+
+        // 移除失效的数据
+        for (Map.Entry<UUID, Entry> e : noExists) {
+            Entry entry = cache.get(e.getKey());
+
+            // 数据已被移除
+            if (entry == null) continue;
+
+            // 在移除前数据被更改
+            if (!e.getValue().equals(entry)) continue;
+
+            // 进行移除
+            cache.remove(e.getKey());
+        }
     }
 
     @AllArgsConstructor

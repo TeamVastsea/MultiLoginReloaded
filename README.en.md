@@ -29,34 +29,40 @@ MultiLogin is a plugin mainly designed for the Minecraft proxy, aiming to suppor
 
 ## Install
 
-The minimum requirement is `Java 21`, no need to install `authlib-injector`, no prerequisite plugins, and no need to add or change `JVM` parameters
+The minimum requirement is `Java 21`, no need to install `authlib-injector`, no prerequisite plugins, and no need to add or change `JVM` parameters.
 
-1. [Download](https://github.com/TeamVastsea/MultiLoginReloaded/releases/latest) the plugin
-1. Download the latest version from this repository's Releases
-3. Start the server
+1. Download the latest plugin from [Releases](https://github.com/TeamVastsea/MultiLoginReloaded/releases/latest)
+2. Put it into the `plugins` directory of your proxy
+3. Start the server. The plugin downloads its runtime libraries and generates config files on first launch
+
+To try fixes that have not been released yet, grab a [Weekly](https://github.com/TeamVastsea/MultiLoginReloaded/releases/tag/weekly) build.
 
 ## Config
 
-See details in the [Wiki](https://github.com/TeamVastsea/MultiLoginReloaded/wiki)
+See details in the [Wiki](https://github.com/TeamVastsea/MultiLoginReloaded/wiki).
 
 ## Build
 
 1. Clone this project
-2. Execute `./gradlew shadowJar` / `gradlew shadowJar`
-3. Find what you need under `*/build/libs`
+2. Execute `./gradlew shadowJar` (or `gradlew.bat shadowJar` on Windows)
+3. Find the artifact under `velocity/build/libs`
 
-Or you can
+Run the tests with `./gradlew test`.
 
-1. [Fork](https://github.com/TeamVastsea/MultiLoginReloaded/fork) this project
-1. Commit any file in the forked project
+Or you can [Fork](https://github.com/TeamVastsea/MultiLoginReloaded/fork) this project and push any change, then let CI build it for you.
 
 ## BUG Report
 
-[Weekly Ver](https://github.com/TeamVastsea/MultiLoginReloaded/releases/tag/weekly) Click here, perhaps the issue you encountered has been fixed
-Please submit feedback and suggestions via Issues.
+First make sure you are on the latest version. The issue you hit may already be fixed in a [Weekly](https://github.com/TeamVastsea/MultiLoginReloaded/releases/tag/weekly) build.
+
+If it still reproduces, please submit feedback and suggestions via [Issues](https://github.com/TeamVastsea/MultiLoginReloaded/issues), filling in the version, proxy type and logs as completely as you can.
+
+Please do not report security vulnerabilities publicly. See [SECURITY.md](SECURITY.md) instead.
+
+## Contributing
+
+Pull requests are welcome. Please read the [contributing guide](CONTRIBUTING.md) before you start.
 
 <a href="https://github.com/TeamVastsea/MultiLoginReloaded/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=TeamVastsea/MultiLoginReloaded"  alt="Contributor's head"/>
 </a>
-
-[I also want to be one of the contributors?](https://github.com/TeamVastsea/MultiLoginReloaded/pulls)

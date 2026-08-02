@@ -49,13 +49,30 @@ subprojects {
         compileOnly("org.jetbrains:annotations:24.1.0")
         annotationProcessor("org.jetbrains:annotations:24.1.0")
 
+        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+        testCompileOnly("org.jetbrains:annotations:24.1.0")
+
+        testImplementation platform("org.junit:junit-bom:5.10.2")
+        testImplementation("org.junit.jupiter:junit-jupiter")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
         try (def scanner = new Scanner(file.libraries as File)) {
             while (scanner.hasNextLine()) {
                 def line = scanner.nextLine()
                 if (line.trim().length() == 0 || (line.charAt(0) as String) == '#') continue
                 def args = line.split("\\s+")
                 compileOnly group: args[0], name: args[1], version: args[2]
+                // 单元测试需要在运行期真正用到这些依赖，因此不能只是 compileOnly
+                testImplementation group: args[0], name: args[1], version: args[2]
             }
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
         }
     }
 

@@ -41,6 +41,12 @@ jobs:
             echo "release=false" >> $GITHUB_ENV;
           fi
 
+      - name: Test
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: current
+          arguments: test
+
       - name: Build Dev
         if: env.release == 'false'
         uses: gradle/gradle-build-action@v2

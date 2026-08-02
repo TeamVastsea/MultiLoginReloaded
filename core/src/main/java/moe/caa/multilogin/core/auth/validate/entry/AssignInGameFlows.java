@@ -91,7 +91,15 @@ public class AssignInGameFlows extends BaseFlows<ValidateContext> {
                 String finalFixName = fixName;
                 LoggerProvider.getLogger().warn(String.format("The name %s is occupied, change it to %s.", initFixName, fixName));
                 core.getPlugin().getRunServer().getScheduler().runTaskAsync(() -> {
+                    // 这个任务延迟执行，届时玩家可能还没有真正进入服务器或者已经断开连接，
+                    // 所以这里必须判空，否则会抛出 NullPointerException。
                     IPlayer player = core.getPlugin().getRunServer().getPlayerManager().getPlayer(finalInGameUUID);
+                    if (player == null) {
+                        LoggerProvider.getLogger().debug(String.format(
+                                "The player with in game UUID %s is not online, skip the name correct message.", finalInGameUUID
+                        ));
+                        return;
+                    }
                     player.sendMessagePL(core.getLanguageHandler().getMessage("name_correct_info",
                             new Pair<>("old_name", initFixName),
                             new Pair<>("new_name", finalFixName)
@@ -130,7 +138,12 @@ public class AssignInGameFlows extends BaseFlows<ValidateContext> {
         }
     }
 
-    private String incrementString(String source){
+    /**
+     * 把名称末尾的数字加一，没有数字则追加 1。
+     * <p>
+     * 包级可见以便单元测试。
+     */
+    static String incrementString(String source){
         if (source.isEmpty()) return "1";
 
         char c = source.charAt(source.length() - 1);
