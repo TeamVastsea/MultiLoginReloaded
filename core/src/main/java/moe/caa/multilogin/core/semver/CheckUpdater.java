@@ -59,42 +59,47 @@ public class CheckUpdater {
 
     public void start() {
         core.getPlugin().getRunServer().getScheduler().runTaskAsyncTimer(() -> {
-            if (!core.getPluginConfig().isCheckUpdate() || !core.getBuildManifest().getBuildType().equalsIgnoreCase("final")) {
-                return;
-            }
+            // scheduleAtFixedRate 的语义是任务抛出异常后不再被调度，
+            // 因此这里必须捕获所有异常，否则一次失败就会让更新检查永久停止。
             try {
-                List<SemVersion> latestVersionNow = getLatestVersionNow();
-                if (latestVersionNow.isEmpty()) return;
-                if (core.getSemVersion() == null) {
-                    LoggerProvider.getLogger().info(String.format("The latest version is %s, please update.",
-                            ValueUtil.join(", ", " and ", latestVersionNow.stream()
-                                    .map(Object::toString).collect(Collectors.toList()))
-                    ));
-                    // 中文
-                    LoggerProvider.getLogger().info(String.format("你的 MultiLogin 版本并非最新版, 最新版本是 %s, 请更新",
-                            ValueUtil.join(", ", " 和 ", latestVersionNow.stream()
-                                    .map(Object::toString).collect(Collectors.toList()))
-                    ));
-                } else {
-                    SemVersion sv = core.getSemVersion();
-                    for (SemVersion version : latestVersionNow) {
-                        if (sv.needUpgrade(version)) {
-                            sv = version;
-                        }
-                    }
-                    if (!sv.equals(core.getSemVersion())) {
-                        LoggerProvider.getLogger().info(
-                                String.format("The latest recommended version is %s, Please update.", sv
-                                ));
-                        LoggerProvider.getLogger().info(
-                                String.format("你的 MultiLogin 版本并非最新版, 最新版本为 %s, 请更新", sv
-                                ));
-                    }
-                }
-            } catch (IOException e) {
-                LoggerProvider.getLogger().debug("更新检查失败...", e);
+                check();
+            } catch (Throwable throwable) {
+                LoggerProvider.getLogger().debug("更新检查失败...", throwable);
             }
         }, 0, 1000 * 60 * 60 * 12); // 半天一次更新检查
-//        }, 0, 10 * 1000); // 10秒一次 测试用
+    }
+
+    private void check() throws IOException {
+        if (!core.getPluginConfig().isCheckUpdate() || !core.getBuildManifest().getBuildType().equalsIgnoreCase("final")) {
+            return;
+        }
+        List<SemVersion> latestVersionNow = getLatestVersionNow();
+        if (latestVersionNow.isEmpty()) return;
+        if (core.getSemVersion() == null) {
+            LoggerProvider.getLogger().info(String.format("The latest version is %s, please update.",
+                    ValueUtil.join(", ", " and ", latestVersionNow.stream()
+                            .map(Object::toString).collect(Collectors.toList()))
+            ));
+            // 中文
+            LoggerProvider.getLogger().info(String.format("你的 MultiLogin 版本并非最新版, 最新版本是 %s, 请更新",
+                    ValueUtil.join(", ", " 和 ", latestVersionNow.stream()
+                            .map(Object::toString).collect(Collectors.toList()))
+            ));
+        } else {
+            SemVersion sv = core.getSemVersion();
+            for (SemVersion version : latestVersionNow) {
+                if (sv.needUpgrade(version)) {
+                    sv = version;
+                }
+            }
+            if (!sv.equals(core.getSemVersion())) {
+                LoggerProvider.getLogger().info(
+                        String.format("The latest recommended version is %s, Please update.", sv
+                        ));
+                LoggerProvider.getLogger().info(
+                        String.format("你的 MultiLogin 版本并非最新版, 最新版本为 %s, 请更新", sv
+                        ));
+            }
+        }
     }
 }
