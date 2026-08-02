@@ -48,6 +48,11 @@ public class MultiLoginVelocity implements IPlugin {
     @Getter
     private MultiCoreAPI multiCoreAPI;
     private static final String KEY = "MultiLoginChatSession";
+    /**
+     * ChatSession 数据包起始的协议版本号（1.19.3）。
+     * 低于此版本的客户端不会发送 ChatSession 包，因此不需要注入处理器。
+     */
+    private static final int CHAT_SESSION_MIN_PROTOCOL = 761;
     private Injector injector;
     @Inject
     public MultiLoginVelocity(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -85,7 +90,7 @@ public class MultiLoginVelocity implements IPlugin {
             server.getEventManager().register(this, PostLoginEvent.class,
                     (AwaitingEventExecutor<PostLoginEvent>) postLoginEvent -> EventTask.withContinuation(continuation -> {
                         try {
-                            if(postLoginEvent.getPlayer().getProtocolVersion().getProtocol() < 761) return;
+                            if(postLoginEvent.getPlayer().getProtocolVersion().getProtocol() < CHAT_SESSION_MIN_PROTOCOL) return;
                             injectPlayer(postLoginEvent.getPlayer());
                         } finally {
                             continuation.resume();
@@ -143,10 +148,19 @@ public class MultiLoginVelocity implements IPlugin {
     }
 
     private void removePlayer(final Player player) {
+        // injectPlayer 只对 761 及以上协议版本的玩家注入处理器，
+        // 这里必须保持同样的判断，否则移除一个不存在的处理器会抛出 NoSuchElementException。
+        if (player.getProtocolVersion().getProtocol() < CHAT_SESSION_MIN_PROTOCOL) return;
         final ConnectedPlayer connectedPlayer = (ConnectedPlayer) player;
         final Channel channel = connectedPlayer.getConnection().getChannel();
         channel.eventLoop().submit(() -> {
-            channel.pipeline().remove(KEY);
+            try {
+                if (channel.pipeline().get(KEY) != null) {
+                    channel.pipeline().remove(KEY);
+                }
+            } catch (Throwable throwable) {
+                LoggerProvider.getLogger().debug("Unable to remove the chat session handler.", throwable);
+            }
         });
     }
 }
